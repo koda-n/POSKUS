@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vreme</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+      h1 {
+        font-size: 35px;
+        color: cadetblue;
+      }
+      form {
+        font-size: 30px;
+      }
+      h3 {
+        font-size: 19px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <form id="vnesi">
+      <input id="mesto" type="text" placeholder="Type city" />
+      <input type="submit" value="Search" />
+    </form>
+    <h1 class="city">Somewhere</h1>
+
+    <h3>Today,time</h3>
+    <ul>
+      <li>Stopinje: <span class="st">10</span></li>
+      <br />
+      <li>Feels like: <span class="fl">23</span></li>
+      <br />
+      <li>Vlaga: <span class="vl">32</span></li>
+      <br />
+      <li>Veter: <span class="ve">pl</span></li>
+    </ul>
+  </body>
+  <script>
+    function prikaziDatum() {
+      let datum = new Date();
+      let ura = datum.getHours();
+      let minuta = datum.getMinutes();
+      if (minuta < 10) {
+        minuta = `0${minuta}`;
+      }
+      let days = [
+        "NEDELJA",
+        "PONEDELJEK",
+        "TOREK",
+        "SREDA",
+        "ČETRTEK",
+        "PETEK",
+        "SOBOTA",
+      ];
+      let dan = days[datum.getDay()];
+      let stavek = `${dan}, ${ura}:${minuta}`;
+      let h3 = document.querySelector("h3");
+      h3.innerHTML = stavek;
+    }
+    prikaziDatum();
+
+    function lokacija(event) {
+      prikaziDatum();
+      event.preventDefault();
+      let vnesi = document.querySelector("#mesto");
+      let mesto = document.querySelector(".city");
+      mesto.innerHTML = vnesi.value;
+
+      function napoved(response) {
+        console.log(response);
+        let stopinje = Math.round(response.data.main.temp);
+        console.log(stopinje);
+        let stop = document.querySelector(".st");
+        stop.innerHTML = `${stopinje}°C`;
+
+        let feelsLike = Math.round(response.data.main.feels_like);
+        console.log(feelsLike);
+        let fils = document.querySelector(".fl");
+        fils.innerHTML = `${feelsLike}°C`;
+
+        let vlaga = Math.round(response.data.main.humidity);
+        console.log(vlaga);
+        let vla = document.querySelector(".vl");
+        vla.innerHTML = `${vlaga} %`;
+
+        let veter = Math.round(response.data.wind.speed * 3.6);
+        console.log(veter);
+        let vtr = document.querySelector(".ve");
+        vtr.innerHTML = `${veter} km/h`;
+      }
+
+      let cityName = vnesi.value;
+      let url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&units=metric&appid=f8b197b8ac625b62389f229440e44443`;
+      axios.get(url).then(napoved);
+    }
+    let h1 = document.querySelector("#vnesi");
+    h1.addEventListener("submit", lokacija);
+  </script>
+</html>
